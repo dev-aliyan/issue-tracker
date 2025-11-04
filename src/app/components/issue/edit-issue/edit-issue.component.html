@@ -1,0 +1,176 @@
+<div class="w-full text-white">
+  <div class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl shadow-2xl overflow-hidden ">
+    <div class="p-8">
+      <div class="flex items-center gap-3 mb-8">
+        <button class="p-2 rounded-full bg-white/10 hover:bg-white/20 transition" (click)="onCancel()">
+          <i class="pi pi-arrow-left text-white"></i>
+        </button>
+        <h1 class="text-3xl font-bold tracking-wide text-white">Edit Issue</h1>
+      </div>
+      <p class="text-gray-300 mb-6">Update issue details below</p>
+
+      <div *ngIf="loading && !issue" class="text-center py-16">
+        <p-progressSpinner [style]="{ width: '50px', height: '50px', margin: 'auto' }"></p-progressSpinner>
+        <p class="text-gray-300 mt-4">Loading issue...</p>
+      </div>
+
+      <div *ngIf="notFound && !loading" class="text-center py-12">
+        <i class="pi pi-exclamation-circle text-4xl text-yellow-400 mb-3"></i>
+        <h2 class="text-xl font-semibold text-white mb-2">Issue Not Found</h2>
+        <p class="text-gray-300 mb-6">The issue you're looking for doesn't exist.</p>
+        <button class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white px-5 py-2 rounded-xl" (click)="goToDashboard()">Back to Dashboard</button>
+      </div>
+
+      <div *ngIf="permissionDenied && !loading" class="text-center py-12">
+        <i class="pi pi-lock text-4xl text-red-500 mb-3"></i>
+        <h2 class="text-xl font-semibold text-white mb-2">Permission Denied</h2>
+        <p class="text-gray-300 mb-6">Only admins or the issue creator can edit this issue.</p>
+        <button class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white px-5 py-2 rounded-xl" (click)="goToDashboard()">Back to Dashboard</button>
+      </div>
+
+      <div *ngIf="issue && !notFound && !permissionDenied">
+        <div class="bg-white/10 rounded-xl border border-white/10 p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-white">
+          <div>
+            <p class="text-gray-400 text-xs uppercase font-semibold">Issue ID</p>
+            <p class="font-bold text-blue-300">{{ issueId }}</p>
+          </div>
+          <div>
+            <p class="text-gray-400 text-xs uppercase font-semibold">Created By</p>
+            <p class="font-medium">{{ getCreatorName(issue.createdBy) }}</p>
+          </div>
+          <div>
+            <p class="text-gray-400 text-xs uppercase font-semibold">Created</p>
+            <p>{{ issue.createdAt | date:'short' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-400 text-xs uppercase font-semibold">Updated</p>
+            <p>{{ issue.updatedAt | date:'short' }}</p>
+          </div>
+        </div>
+
+        <p-message *ngIf="success" severity="success" text="Issue updated successfully!" styleClass="mb-6 w-full"></p-message>
+        <p-message *ngIf="error" severity="error" [text]="error" styleClass="mb-6 w-full"></p-message>
+
+        <div *ngIf="hasChanges" class="bg-yellow-400/10 border border-yellow-500/30 rounded-lg p-4 mb-6 flex gap-3">
+          <i class="pi pi-exclamation-triangle text-yellow-400 text-xl"></i>
+          <div>
+            <p class="font-semibold text-yellow-300">Unsaved Changes</p>
+            <p class="text-gray-200 text-sm">Click “Update Issue” to save them.</p>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form (ngSubmit)="onSubmit($event)" class="space-y-6 text-white" novalidate>
+          <div>
+            <label class="block text-sm font-semibold mb-2">Title</label>
+            <input
+              pInputText
+              [(ngModel)]="title"
+              (input)="onInputChange()"
+              name="title"
+              placeholder="Enter issue title"
+              class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 placeholder-gray-400"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">Description</label>
+            <textarea
+              pInputTextarea
+              [(ngModel)]="description"
+              (input)="onInputChange()"
+              name="description"
+              rows="5"
+              placeholder="Issue description"
+              class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 placeholder-gray-400"
+              required>
+            </textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold mb-2">State</label>
+              <p-dropdown
+                [(ngModel)]="state"
+                (onChange)="onInputChange()"
+                name="state"
+                [options]="stateOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full glass-dropdown"
+                [disabled]="loading">
+              </p-dropdown>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">Assigned To</label>
+              <p-dropdown
+                [(ngModel)]="assignedTo"
+                (onChange)="onInputChange()"
+                name="assignedTo"
+                [options]="userOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full glass-dropdown"
+                [disabled]="loading">
+              </p-dropdown>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold mb-2">Estimated Time (hrs)</label>
+              <p-inputNumber
+                [(ngModel)]="estimatedTime"
+                (onInput)="onInputChange()"
+                name="estimatedTime"
+                [min]="1"
+                [max]="1000"
+                styleClass="w-full glass-input"
+                [disabled]="loading">
+              </p-inputNumber>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">Completed Time (hrs)</label>
+              <p-inputNumber
+                [(ngModel)]="completedTime"
+                (onInput)="onInputChange()"
+                name="completedTime"
+                [min]="0"
+                [max]="1000"
+                styleClass="w-full glass-input"
+                [disabled]="loading">
+              </p-inputNumber>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">Due Date</label>
+            <p-calendar
+              [(ngModel)]="dueDate"
+              name="dueDate"
+              (onSelect)="onInputChange()"
+              [showIcon]="true"
+              styleClass="w-full glass-input"
+              [disabled]="loading">
+            </p-calendar>
+          </div>
+
+          <div class="bg-blue-500/10 border border-blue-400/20 rounded-lg p-4 text-sm">
+            <i class="pi pi-info-circle text-blue-400 mr-2"></i>
+            All updates will be logged with timestamps for tracking.
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex flex-wrap gap-4 pt-6 border-t border-white/10">
+            <button type="submit" class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white shadow-lg hover:opacity-90 transition px-6 py-2 rounded-xl" [disabled]="loading || !hasChanges">Update Issue</button>
+            <button type="button" class="px-6 py-2 rounded-xl bg-yellow-500/20 hover:bg-yellow-500/30 transition" (click)="resetForm()">Reset</button>
+            <button type="button" class="px-6 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 transition" (click)="markAsCompleted()">Mark Completed</button>
+            <button type="button" class="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition ms-auto" (click)="onCancel()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

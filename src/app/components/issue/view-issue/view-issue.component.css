@@ -1,0 +1,221 @@
+:host ::ng-deep input.p-inputtext:not(.p-dropdown-label) {
+  background: rgba(17, 24, 39, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+}
+
+:host ::ng-deep input.p-inputtext:not(.p-dropdown-label):hover {
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+}
+
+:host ::ng-deep input.p-inputtext:not(.p-dropdown-label):focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  outline: none;
+  background: rgba(17, 24, 39, 0.4);
+}
+
+:host ::ng-deep input.p-inputtext:not(.p-dropdown-label)::placeholder {
+  color: rgba(148, 163, 184, 0.8);
+}
+
+:host ::ng-deep input.p-inputtext:not(.p-dropdown-label):disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(30, 41, 59, 0.6);
+}
+
+:host ::ng-deep .p-dropdown {
+  background: rgba(17, 24, 39, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  color: #e2e8f0 !important;
+  font-size: 0.95rem !important;
+  width: 100%;
+  padding: 0.6rem 0.5rem 0.4rem 0.5rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+}
+
+:host ::ng-deep .p-dropdown:hover {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4) !important;
+}
+
+:host ::ng-deep .p-dropdown.p-focus,
+:host ::ng-deep .p-dropdown.p-dropdown-open {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6) !important;
+  background: rgba(17, 24, 39, 0.4) !important;
+}
+
+:host ::ng-deep .p-dropdown-label {
+  color: #f1f5f9 !important;
+  padding-left: 0.6rem;
+  padding-top: 0.2rem;
+}
+
+:host ::ng-deep .p-dropdown-trigger {
+  background: transparent !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.6rem !important;
+  color: #9ca3af !important;
+  transition: color 0.25s ease;
+}
+
+:host ::ng-deep .p-dropdown-trigger:hover {
+  color: #a78bfa !important;
+}
+
+:host ::ng-deep .p-dropdown-panel {
+  background: rgb(17, 24, 39);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+:host ::ng-deep .p-dropdown-items .p-dropdown-item {
+  color: #e2e8f0;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .p-dropdown-items .p-dropdown-item:hover {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c084fc;
+}
+
+:host ::ng-deep .p-dropdown-items .p-highlight {
+  background: rgba(99, 102, 241, 0.3) !important;
+  color: #fff !important;
+}
+
+
+:host ::ng-deep .p-inputtextarea {
+  background: rgba(17, 24, 39, 0.2); 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  resize: vertical;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+}
+
+:host ::ng-deep .p-inputtextarea:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+}
+
+:host ::ng-deep .p-inputtextarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  outline: none;
+  background: rgba(17, 24, 39, 0.4);
+}
+
+:host ::ng-deep .p-inputtextarea::placeholder {
+  color: rgba(148, 163, 184, 0.8);
+}
+
+
+:host ::ng-deep .p-inputtextarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(30, 41, 59, 0.6);
+}
+
+
+:host ::ng-deep .p-calendar {
+  width: 100%;
+  background: rgba(17, 24, 39, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+:host ::ng-deep .p-calendar:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+}
+
+:host ::ng-deep .p-calendar:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  background: rgba(17, 24, 39, 0.4);
+}
+
+
+:host ::ng-deep .p-inputtext.p-calendar-input {
+  background: transparent !important;
+  border: none !important;
+  color: #f1f5f9 !important;
+  width: 100%;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+}
+
+:host ::ng-deep .p-inputtext.p-calendar-input::placeholder {
+  color: rgba(148, 163, 184, 0.8);
+}
+
+:host ::ng-deep .p-calendar .p-datepicker-trigger {
+  background: rgba(17, 24, 39) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  color: #9ca3af !important;
+  padding: 0.7rem !important;
+  border-radius: 0 10px 10px 0 !important;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+
+:host ::ng-deep .p-calendar .p-datepicker-trigger:hover {
+  color: #a78bfa !important;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+:host ::ng-deep .p-datepicker {
+  background: rgba(17, 24, 39, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(15px);
+}
+
+
+:host ::ng-deep .p-datepicker td > span {
+  color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .p-datepicker td > span:hover {
+  background: rgba(124, 58, 237, 0.25) !important;
+  color: #c084fc !important;
+}
+
+:host ::ng-deep .p-datepicker td.p-datepicker-today > span {
+  background: rgba(99, 102, 241, 0.3) !important;
+  color: #fff !important;
+}
+
+:host ::ng-deep .p-calendar.p-disabled,
+:host ::ng-deep .p-calendar .p-inputtext:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(30, 41, 59, 0.6);
+}

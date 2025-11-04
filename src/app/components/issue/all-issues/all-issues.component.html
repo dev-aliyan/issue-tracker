@@ -1,0 +1,146 @@
+  <div class="flex flex-col gap-5">
+
+    <div class="flex items-center justify-between mb-4">
+      <h2 *ngIf="currentUser()?.role == 'admin'" class="text-white text-2xl font-semibold">All Issues</h2>
+      <h2 *ngIf="currentUser()?.role == 'user'" class="text-white text-2xl font-semibold">My Issues</h2>
+    </div>
+    <p-card styleClass="surface-card border-none">
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-3">
+          <span class="relative flex-grow">
+            <input
+              pInputTextarea
+              type="text"
+              placeholder="Search by title, ID, or assignee…"
+              [ngModel]="search()"
+              (ngModelChange)="search.set($event)"
+              class="w-full p-2"
+            />
+            <i class="pi pi-search absolute right-4 top-3"></i>
+          </span>
+
+          <p-button
+            icon="pi pi-filter-slash"
+            class="clear-filter-btn"
+            (click)="clearFilters()"
+          ></p-button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <p-chip
+            [label]="'All states'"
+            [removable]="false"
+            [class.active-chip]="stateFilter()==='all'"
+            (click)="stateFilter.set('all')"
+          ></p-chip>
+
+          <p-chip
+            label="New"
+            [class.active-chip]="stateFilter()==='new'"
+            (click)="stateFilter.set('new')"
+          ></p-chip>
+
+          <p-chip
+            label="In progress"
+            [class.active-chip]="stateFilter()==='in-progress'"
+            (click)="stateFilter.set('in-progress')"
+          ></p-chip>
+
+          <p-chip
+            label="Completed"
+            [class.active-chip]="stateFilter()==='completed'"
+            (click)="stateFilter.set('completed')"
+          ></p-chip>
+
+          <p-chip
+            label="Blocked"
+            [class.active-chip]="stateFilter()==='blocked'"
+            (click)="stateFilter.set('blocked')"
+          ></p-chip>
+
+          <p-chip
+            [label]="myOnly() ? 'My open: On' : 'My open: Off'"
+            (click)="myOnly.set(!myOnly())"
+          ></p-chip>
+
+          <div class="ml-auto text-sm text-gray-300 hidden md:flex gap-6">
+            <span>Unified search + quick chips</span>
+            <span>Kanban default</span>
+            <span>Table for dense ops</span>
+          </div>
+        </div>
+
+      </div>
+    </p-card>
+
+    <p-card styleClass="surface-card border-none">
+      <p-table
+        [value]="filtered()"
+        [paginator]="true"
+        [rows]="10"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 110px">ID</th>
+            <th>Title</th>
+            <th style="width: 160px">State</th>
+            <th style="width: 220px">Assignee</th>
+            <th style="width: 120px">Est.</th>
+            <th style="width: 140px">Due</th>
+            <th style="width: 140px">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-i>
+          <tr>
+            <td>{{ i.id }}</td>
+            <td>{{ i.title }}</td>
+            <td>
+              <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
+            </td>
+            <td>{{ assigneeName(i.assignedTo) }}</td>
+            <td>{{ i.estimatedTime }}h</td>
+            <td>{{ i.dueDate | date: 'MM/dd/yy' }}</td>
+            <td class="text-right">
+               <button pButton icon="pi pi-eye" class="p-button-text mr-1" (click)="openViewModal(i.id)"></button>
+              <button pButton icon="pi pi-pencil" class="p-button-text" (click)="openEditModal(i.id)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <p-dialog
+    [(visible)]="showViewModal"
+    [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '1200px' }"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    styleClass="custom-modal"
+  >
+    <app-view-issue
+      [issueId]="selectedIssueId()"
+      (closed)="closeViewModal()"
+      (deleted)="onIssueDeleted()"
+      (editRequested)="onEditFromView($event)"
+    ></app-view-issue>
+  </p-dialog>
+
+  <p-dialog
+    [(visible)]="showEditModal"
+    [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '1000px' }"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    styleClass="custom-modal"
+  >
+    <app-edit-issue
+      [issueId]="selectedIssueId()"
+      (issueUpdated)="onIssueUpdated()"
+      (cancelled)="closeEditModal()"
+    ></app-edit-issue>
+  </p-dialog>

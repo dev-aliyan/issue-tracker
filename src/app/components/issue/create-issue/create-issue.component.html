@@ -1,0 +1,160 @@
+<div class="w-full text-white">
+    <div
+      class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl shadow-2xl overflow-hidden"
+    >
+      <div class="p-8">
+        <div class="mb-10 text-center">
+          <h1
+            class="text-4xl font-bold bg-gradient-to-r from-pink-500 via-purple-400 to-blue-500 bg-clip-text text-transparent"
+          >
+            Create New Issue
+          </h1>
+          <p class="text-gray-300 mt-3">
+            Fill in the details to create a new issue
+          </p>
+        </div>
+
+        <p-message
+          *ngIf="success"
+          severity="success"
+          text="✅ Issue created successfully!"
+          styleClass="mb-6 w-full"
+        ></p-message>
+        <p-message
+          *ngIf="error"
+          severity="error"
+          [text]="error"
+          styleClass="mb-6 w-full"
+        ></p-message>
+
+        <form (ngSubmit)="onSubmit($event)" class="space-y-8" novalidate>
+          <div>
+            <label class="block text-sm font-semibold text-gray-200 mb-2">
+              Issue Title <span class="text-pink-400">*</span>
+            </label>
+            <input
+              pInputText
+              [(ngModel)]="title"
+              name="title"
+              placeholder="Enter a clear, concise issue title"
+              class="w-full"
+              [disabled]="loading"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-200 mb-2">
+              Description <span class="text-pink-400">*</span>
+            </label>
+            <textarea
+              pInputTextarea
+              [(ngModel)]="description"
+              name="description"
+              placeholder="Provide detailed description of the issue"
+              rows="5"
+              class="w-full"
+              [disabled]="loading"
+              required
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-200 mb-2">
+                Estimated Time (Hours) <span class="text-pink-400">*</span>
+              </label>
+              <p-inputNumber
+                [(ngModel)]="estimatedTime"
+                name="estimatedTime"
+                [min]="1"
+                [max]="1000"
+                placeholder="e.g. 8"
+                class="w-full"
+                [disabled]="loading"
+                required
+              ></p-inputNumber>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-200 mb-2">
+                Due Date <span class="text-pink-400">*</span>
+              </label>
+              <p-calendar
+                [(ngModel)]="dueDate"
+                name="dueDate"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                placeholder="Select due date"
+                class="w-full"
+                [minDate]="getMinDueDate()"
+                [disabled]="loading"
+                required
+              ></p-calendar>
+            </div>
+          </div>
+
+          <div *ngIf="currentUser?.role === 'admin'">
+            <label class="block text-sm font-semibold text-gray-200 mb-2">
+              Assign To <span class="text-pink-400">*</span>
+            </label>
+            <p-dropdown
+              [(ngModel)]="assignedTo"
+              name="assignedTo"
+              [options]="userOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select user"
+              class="w-full"
+              [disabled]="loading"
+              required
+            ></p-dropdown>
+          </div>
+
+          <div
+            class="bg-white/10 border border-white/20 rounded-xl p-5 flex gap-3 items-start"
+          >
+            <i class="pi pi-info-circle text-blue-400 text-2xl"></i>
+            <div>
+              <p class="font-semibold text-white">Issue Details</p>
+              <p class="text-sm text-gray-300 mt-1">
+                New issues start with state
+                <span class="text-blue-300 font-medium">New</span> and 0 completed
+                hours.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10">
+            <button
+              type="submit"
+              pButton
+              label="Create Issue"
+              icon="pi pi-plus"
+              [disabled]="
+                loading ||
+                !title ||
+                !description ||
+                !estimatedTime ||
+                !dueDate ||
+                (currentUser?.role === 'admin' && !assignedTo)
+              "
+              class="flex-1 bg-gradient-to-r from-[#821D3F] via-[#370F2F] to-[#3A3B92] text-white font-semibold rounded-xl shadow-lg border-none py-3 px-4
+                    hover:opacity-90 hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+            ></button>
+
+            <button
+              type="button"
+              pButton
+              label="Cancel"
+              icon="pi pi-times"
+              (click)="onCancel()"
+              [disabled]="loading"
+              class="flex-1 bg-white/10 text-gray-300 border-none font-semibold rounded-xl shadow-lg py-3 px-4
+                    hover:bg-white/20 hover:text-white transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>

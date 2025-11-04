@@ -1,0 +1,20 @@
+[
+  {
+    "id": "USR-001",
+    "firstName": "Alyan",
+    "lastName": "Ahmed",
+    "email": "admin@example.com",
+    "password": "12345",
+    "role": "admin",
+    "createdAt": "2025-10-16T00:00:00Z"
+  },
+  {
+    "id": "USR-002",
+    "firstName": "Sara",
+    "lastName": "Khan",
+    "email": "engineer@example.com",
+    "password": "12345",
+    "role": "user",
+    "createdAt": "2025-10-16T00:00:00Z"
+  }
+]
