@@ -25,8 +25,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
 
 import { CreateIssueComponent } from '../issue/create-issue/create-issue.component';
-import { EditIssueComponent } from '../issue/edit-issue/edit-issue.component';
-import { ViewIssueComponent } from '../issue/view-issue/view-issue.component';
+import { IssueDetailComponent } from '../issue/issue-detail/issue-detail.component';
 
 type StateKey = Issue['state'];
 
@@ -38,7 +37,7 @@ type StateKey = Issue['state'];
     InputTextModule, InputTextareaModule, ButtonModule, TagModule, CardModule,
     ChipModule, TabViewModule, TableModule, RippleModule, TooltipModule,
     DragDropModule, DialogModule, CheckboxModule, MultiSelectModule,
-    CreateIssueComponent, EditIssueComponent, ViewIssueComponent
+    CreateIssueComponent, IssueDetailComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -46,23 +45,19 @@ type StateKey = Issue['state'];
 })
 export class DashboardComponent {
 
-  // Data
   private allIssues = signal<Issue[]>([]);
   private users = signal<User[]>([]);
   currentUser = signal<User | null>(null);
 
-  // UI state
   search = signal<string>('');
   myOnly = signal<boolean>(false);
   showFilterToolbar = signal<boolean>(false);
   activeTab = signal<'board' | 'table'>('board');
 
   showCreateModal = signal<boolean>(false);
-  showEditModal = signal<boolean>(false);
-  showViewModal = signal<boolean>(false);
+  showDetailModal = signal<boolean>(false);
   selectedIssueId = signal<string>('');
 
-  // Filters (signals!)
   selectedStates = signal<string[]>([]);
   selectedAssignees = signal<string[]>([]);
 
@@ -79,21 +74,18 @@ export class DashboardComponent {
     private issueSvc: IssueService,
     private userSvc: UserService
   ) {
-    // seed data
+
     this.allIssues.set(this.issueSvc.getAllIssues());
     this.users.set(this.userSvc.getAllUsers());
     this.currentUser.set(this.userSvc.getCurrentUser());
 
-    // live updates
     this.issueSvc.issues$.subscribe(list => this.allIssues.set(list));
 
-    // build assignee options (prepend "Me")
     const meId = this.currentUser()?.id ?? null;
     const base = this.users().map(u => ({ label: `${u.firstName} ${u.lastName}`, value: u.id }));
     this.assigneeOptions = meId ? [{ label: 'Me', value: meId }, ...base] : base;
   }
 
-  // Filtering
   filtered = computed(() => {
     const q = this.search().trim().toLowerCase();
     const me = this.myOnly();
@@ -118,19 +110,16 @@ export class DashboardComponent {
     });
   });
 
-  // Board columns
   colBacklog = computed(() => this.filtered().filter(i => i.state === 'new'));
   colProgress = computed(() => this.filtered().filter(i => i.state === 'in-progress'));
   colBlocked = computed(() => this.filtered().filter(i => i.state === 'blocked'));
   colDone = computed(() => this.filtered().filter(i => i.state === 'completed'));
 
-  // KPI
   kpiTotal = computed(() => this.filtered().length);
   kpiProgress = computed(() => this.filtered().filter(i => i.state === 'in-progress').length);
   kpiCompleted = computed(() => this.filtered().filter(i => i.state === 'completed').length);
   kpiBlocked = computed(() => this.filtered().filter(i => i.state === 'blocked').length);
 
-  // helpers
   trackById(index: number, item: Issue): string {
     return item.id;
   }
@@ -155,7 +144,6 @@ export class DashboardComponent {
     }
   }
 
-  // DnD move
   drop(event: CdkDragDrop<Issue[]>, newState: StateKey) {
     if (event.previousContainer === event.container) return;
     const item = event.previousContainer.data[event.previousIndex];
@@ -163,18 +151,8 @@ export class DashboardComponent {
     this.allIssues.set([...this.issueSvc.getAllIssues()]);
   }
 
-  // toolbar
   toggleFilterToolbar() {
     this.showFilterToolbar.set(!this.showFilterToolbar());
-  }
-
-  applyFilters() {
-    // reactive already; keep for telemetry / future hooks
-    console.log('Filters applied:', {
-      states: this.selectedStates(),
-      assignees: this.selectedAssignees(),
-      myOnly: this.myOnly()
-    });
   }
 
   clearFilters() {
@@ -184,14 +162,23 @@ export class DashboardComponent {
     this.myOnly.set(false);
   }
 
-  // modals
-  openCreateModal() { this.showCreateModal.set(true); }
-  openViewModal(issueId: string) { this.selectedIssueId.set(issueId); this.showViewModal.set(true); }
-  openEditModal(issueId: string) { this.selectedIssueId.set(issueId); this.showEditModal.set(true); }
+  openCreateModal() { 
+    this.showCreateModal.set(true); 
+  }
 
-  closeCreateModal() { this.showCreateModal.set(false); }
-  closeViewModal() { this.showViewModal.set(false); this.selectedIssueId.set(''); }
-  closeEditModal() { this.showEditModal.set(false); this.selectedIssueId.set(''); }
+  openIssueDetail(issueId: string) { 
+    this.selectedIssueId.set(issueId); 
+    this.showDetailModal.set(true); 
+  }
+
+  closeCreateModal() { 
+    this.showCreateModal.set(false); 
+  }
+
+  closeDetailModal() { 
+    this.showDetailModal.set(false); 
+    this.selectedIssueId.set(''); 
+  }
 
   onIssueCreated() {
     this.closeCreateModal();
@@ -199,17 +186,11 @@ export class DashboardComponent {
   }
 
   onIssueUpdated() {
-    this.closeEditModal();
     this.allIssues.set([...this.issueSvc.getAllIssues()]);
   }
 
   onIssueDeleted() {
-    this.closeViewModal();
+    this.closeDetailModal();
     this.allIssues.set([...this.issueSvc.getAllIssues()]);
-  }
-
-  onEditFromView(issueId: string) {
-    this.closeViewModal();
-    this.openEditModal(issueId);
   }
 }

@@ -1,0 +1,31 @@
+@media (min-width: 1024px) {
+  .right-col {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow: visible; 
+  }
+}
+
+.two-col > .left-col,
+.two-col > .right-col {
+  align-self: stretch;
+}
+
+
+.activity-panel {
+  min-height: 300px;                
+  max-height: calc(100vh - 24rem);   
+}
+
+.activity-panel .grow {
+  max-height: inherit;
+  overflow: auto;
+}
+
+
+.activity-panel .grow::-webkit-scrollbar { width: 8px; }
+.activity-panel .grow::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}

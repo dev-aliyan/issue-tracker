@@ -141,8 +141,8 @@
             ></p-tag>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <div class="text-white text-sm font-medium">{{ i.title }}</div>
+          <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
+            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
             <div class="text-neutral-300 text-xs">{{ i.description }}</div>
           </div>
 
@@ -159,11 +159,6 @@
               <i class="pi pi-calendar text-xs"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
-          </div>
-
-          <div class="actions flex justify-end gap-2">
-            <button pButton icon="pi pi-eye" class="p-button-text text-white flex rounded-full" (click)="openViewModal(i.id)"></button>
-            <button pButton icon="pi pi-pencil" class="p-button-text text-white flex rounded-full" (click)="openEditModal(i.id)"></button>
           </div>
         </div>
       </div>
@@ -189,8 +184,8 @@
             <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <div class="text-white text-sm font-medium">{{ i.title }}</div>
+          <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
+            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
             <div class="text-neutral-300 text-xs">{{ i.description }}</div>
           </div>
 
@@ -207,11 +202,6 @@
               <i class="pi pi-calendar text-xs"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
-          </div>
-
-          <div class="actions flex justify-end gap-2">
-            <button pButton icon="pi pi-eye" class="p-button-text text-white flex rounded-full" (click)="openViewModal(i.id)"></button>
-            <button pButton icon="pi pi-pencil" class="p-button-text text-white flex rounded-full" (click)="openEditModal(i.id)"></button>
           </div>
         </div>
       </div>
@@ -237,8 +227,8 @@
             <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <div class="text-white text-sm font-medium">{{ i.title }}</div>
+          <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
+            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
             <div class="text-neutral-300 text-xs">{{ i.description }}</div>
           </div>
 
@@ -255,11 +245,6 @@
               <i class="pi pi-calendar text-xs"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
-          </div>
-
-          <div class="actions flex justify-end gap-2">
-            <button pButton icon="pi pi-eye" class="p-button-text text-white flex rounded-full" (click)="openViewModal(i.id)"></button>
-            <button pButton icon="pi pi-pencil" class="p-button-text text-white flex rounded-full" (click)="openEditModal(i.id)"></button>
           </div>
         </div>
       </div>
@@ -285,8 +270,8 @@
             <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
           </div>
 
-          <div class="flex flex-col gap-1">
-            <div class="text-white text-sm font-medium">{{ i.title }}</div>
+          <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
+            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
             <div class="text-neutral-300 text-xs">{{ i.description }}</div>
           </div>
 
@@ -303,11 +288,6 @@
               <i class="pi pi-calendar text-xs"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
-          </div>
-
-          <div class="actions flex justify-end gap-2">
-            <button pButton icon="pi pi-eye" class="p-button-text text-white flex rounded-full" (click)="openViewModal(i.id)"></button>
-            <button pButton icon="pi pi-pencil" class="p-button-text text-white flex rounded-full" (click)="openEditModal(i.id)"></button>
           </div>
         </div>
       </div>
@@ -330,24 +310,20 @@
             <th style="width: 220px">Assignee</th>
             <th style="width: 120px">Est.</th>
             <th style="width: 140px">Due</th>
-            <th style="width: 140px">Actions</th>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-i>
-          <tr>
+          <tr class="cursor-pointer hover:bg-white/5 transition" (click)="openIssueDetail(i.id)">
             <td>{{ i.id }}</td>
-            <td>{{ i.title }}</td>
+            <td class="font-medium hover:text-blue-300">{{ i.title }}</td>
             <td>
               <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
             </td>
             <td>{{ assigneeName(i.assignedTo) }}</td>
             <td>{{ i.estimatedTime }}h</td>
             <td>{{ i.dueDate | date: 'MM/dd/yy' }}</td>
-            <td class="text-right">
-              <button pButton icon="pi pi-eye" class="p-button-text mr-1" (click)="openViewModal(i.id)"></button>
-              <button pButton icon="pi pi-pencil" class="p-button-text" (click)="openEditModal(i.id)"></button>
-            </td>
+            <td></td>
           </tr>
         </ng-template>
       </p-table>
@@ -355,7 +331,6 @@
   </div>
 </div>
 
-<!-- Dialogs -->
 <p-dialog
   [(visible)]="showCreateModal"
   [modal]="true"
@@ -372,34 +347,18 @@
 </p-dialog>
 
 <p-dialog
-  [(visible)]="showViewModal"
+  [(visible)]="showDetailModal"
   [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '1200px' }"
+  [style]="{ width: '95vw', maxWidth: '1400px' }"
   [draggable]="false"
   [resizable]="false"
   [closable]="true"
   styleClass="custom-modal"
 >
-  <app-view-issue
+  <app-issue-detail 
     [issueId]="selectedIssueId()"
-    (closed)="closeViewModal()"
+    (closed)="closeDetailModal()"
     (deleted)="onIssueDeleted()"
-    (editRequested)="onEditFromView($event)"
-  ></app-view-issue>
-</p-dialog>
-
-<p-dialog
-  [(visible)]="showEditModal"
-  [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '1000px' }"
-  [draggable]="false"
-  [resizable]="false"
-  [closable]="true"
-  styleClass="custom-modal"
->
-  <app-edit-issue
-    [issueId]="selectedIssueId()"
-    (issueUpdated)="onIssueUpdated()"
-    (cancelled)="closeEditModal()"
-  ></app-edit-issue>
+    (issueUpdated)="onIssueUpdated()">
+  </app-issue-detail>
 </p-dialog>
