@@ -9,6 +9,33 @@
   border: 1px solid rgba(255,255,255,0.06);
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #030A26, #370F2F 55%, #821D3F);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #030A26, #370F2F 55%, #821D3F);
+
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #8b5cf6 rgba(255, 255, 255, 0.05);
+  }
+
+
 .kpi { background: rgba(255,255,255,0.03); }
 .kpi .kpi-title { color: #c9c9d3; font-size: 0.8rem; }
 .kpi .kpi-value { color: #fff; font-size: 1.8rem; font-weight: 700; }

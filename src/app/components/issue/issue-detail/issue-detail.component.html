@@ -86,11 +86,11 @@
               <i class="pi pi-check text-xs"></i> Save & Close
             </button>
 
-            
             <button 
               *ngIf="hasChanges"
-              class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/20 transition font-semibold text-sm flex items-center gap-2"
-              (click)="cancelChanges()">
+              class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/20 transition font-semibold text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              (click)="cancelChanges()"
+              [disabled]="loading">
               <i class="pi pi-times text-xs"></i> Cancel
             </button>
 

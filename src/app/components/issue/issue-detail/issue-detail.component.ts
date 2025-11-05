@@ -57,7 +57,7 @@ export class IssueDetailComponent implements OnInit, OnChanges {
   currentUser: User | null = null;
 
   loading = false;
-  // kept for logic but not rendered in UI
+  
   error = '';
   success = false;
   notFound = false;
@@ -297,6 +297,9 @@ export class IssueDetailComponent implements OnInit, OnChanges {
         this.resetForm();
         this.editingField = null;
         this.toastInfo('Changes discarded.');
+        setTimeout(() => {
+          this.closed.emit();
+        }, 500);
       }
     } else {
       this.editingField = null;
@@ -348,18 +351,18 @@ export class IssueDetailComponent implements OnInit, OnChanges {
       this.editingField = null;
       this.toastSuccess('Issue updated — closing…');
 
-      setTimeout(() => {
-        this.issueUpdated.emit();
-        this.goToDashboard();
-        this.closed.emit();
-      }, 8000);
-
       
+      setTimeout(() => {
+        this.loading = false;
+        this.issueUpdated.emit();
+        this.closed.emit();
+      }, 1500);
+
     } catch (err: any) {
+      this.loading = false;  
       this.toastError(err?.message || 'Failed to update issue. Please try again.');
-    } finally {
-      this.loading = false;
     }
+
   }
 
   resetForm(): void {
@@ -416,7 +419,7 @@ export class IssueDetailComponent implements OnInit, OnChanges {
     }
   }
 
-  // Toast helpers
+  
   private toastSuccess(detail: string, summary = 'Success') {
     this.messageService.add({ severity: 'success', summary, detail });
   }
