@@ -14,11 +14,10 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
-import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TabViewModule } from 'primeng/tabview';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-issue-detail',
@@ -28,9 +27,10 @@ import { TabViewModule } from 'primeng/tabview';
   imports: [
     CommonModule, FormsModule,
     InputTextModule, InputTextareaModule, DropdownModule, CalendarModule,
-    InputNumberModule, ButtonModule, MessageModule, MessagesModule, 
+    InputNumberModule, ButtonModule,
     ToastModule, ProgressSpinnerModule, TabViewModule
-  ]
+  ],
+  providers: [MessageService]
 })
 export class IssueDetailComponent implements OnInit, OnChanges {
   @Input() issueId = '';
@@ -38,7 +38,8 @@ export class IssueDetailComponent implements OnInit, OnChanges {
   @Output() deleted = new EventEmitter<void>();
   @Output() issueUpdated = new EventEmitter<void>();
 
-  isEditMode = false;
+  editingField: string | null = null;
+  showDeleteMenu = false;
 
   issue: Issue | null = null;
   originalIssue: Issue | null = null;
@@ -50,11 +51,13 @@ export class IssueDetailComponent implements OnInit, OnChanges {
   estimatedTime: number | null = null;
   completedTime: number | null = null;
   dueDate: Date | null = null;
+  minDueDate!: Date;
 
   allUsers: User[] = [];
   currentUser: User | null = null;
 
   loading = false;
+  // kept for logic but not rendered in UI
   error = '';
   success = false;
   notFound = false;
@@ -74,13 +77,21 @@ export class IssueDetailComponent implements OnInit, OnChanges {
   constructor(
     private issueService: IssueService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.userService.getCurrentUser();
     this.allUsers = this.userService.getAllUsers();
     this.buildUserOptions();
+    this.minDueDate = this.getMinDueDate();
+  }
+
+  getMinDueDate(): Date {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -90,9 +101,9 @@ export class IssueDetailComponent implements OnInit, OnChanges {
   }
 
   buildUserOptions(): void {
-    this.userOptions = this.allUsers.map(u => ({ 
-      label: `${u.firstName} ${u.lastName}`, 
-      value: u.id 
+    this.userOptions = this.allUsers.map(u => ({
+      label: `${u.firstName} ${u.lastName}`,
+      value: u.id
     }));
   }
 
@@ -101,13 +112,14 @@ export class IssueDetailComponent implements OnInit, OnChanges {
     this.error = '';
     this.notFound = false;
     this.permissionDenied = false;
-    this.isEditMode = false;
+    this.editingField = null;
 
     const foundIssue = this.issueService.getIssueById(this.issueId);
 
     if (!foundIssue) {
       this.notFound = true;
       this.loading = false;
+      this.toastError(`Issue ${this.issueId} was not found.`);
       return;
     }
 
@@ -134,7 +146,7 @@ export class IssueDetailComponent implements OnInit, OnChanges {
   getStateClass(state: string): string {
     switch (state) {
       case 'new':         return 'bg-blue-500/20 text-blue-300 border-blue-400/30';
-      case 'in-progress': return 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30';
+      case 'in-progress': return 'bg-yellow-500/50 text-yellow-300 border-yellow-400/50';
       case 'completed':   return 'bg-green-500/20 text-green-300 border-green-400/30';
       case 'blocked':     return 'bg-red-500/20 text-red-300 border-red-400/30';
       default:            return 'bg-gray-500/20 text-gray-300 border-gray-400/30';
@@ -171,25 +183,39 @@ export class IssueDetailComponent implements OnInit, OnChanges {
     return this.currentUser.role === 'admin' || this.issue.createdBy === this.currentUser.id;
   }
 
-  enterEditMode(): void {
+  startEditing(field: string): void {
     if (!this.canEditIssue()) {
       this.permissionDenied = true;
+      setTimeout(() => this.permissionDenied = false, 3000);
+      this.toastError('Only admins or the issue creator can edit this issue.', 'Permission denied');
       return;
     }
-    this.isEditMode = true;
+    this.editingField = field;
     this.error = '';
-    this.success = false;
+    this.showDeleteMenu = false;
   }
 
-  exitEditMode(): void {
+  toggleDeleteMenu(): void {
+    this.showDeleteMenu = !this.showDeleteMenu;
+  }
+
+  closeModal(): void {
     if (this.hasChanges) {
-      if (confirm('You have unsaved changes. Do you want to discard them?')) {
-        this.resetForm();
-        this.isEditMode = false;
+      if (confirm('You have unsaved changes. Do you want to close without saving?')) {
+        this.closed.emit();
       }
     } else {
-      this.isEditMode = false;
+      this.closed.emit();
     }
+  }
+
+  stopEditing(): void {
+    this.editingField = null;
+    this.checkForChanges();
+  }
+
+  isEditing(field: string): boolean {
+    return this.editingField === field;
   }
 
   onInputChange(): void {
@@ -208,33 +234,32 @@ export class IssueDetailComponent implements OnInit, OnChanges {
       new Date(this.dueDate || '').getTime() !== new Date(this.originalIssue.dueDate).getTime();
   }
 
-  onSubmit(event?: Event): void {
-    event?.preventDefault();
+  saveChanges(): void {
     this.error = '';
     this.success = false;
 
     if (!this.title.trim() || this.title.trim().length < 5) {
-      this.error = 'Issue title must be at least 5 characters long.';
+      this.toastError('Issue title must be at least 5 characters long.');
       return;
     }
     if (!this.description.trim() || this.description.trim().length < 10) {
-      this.error = 'Issue description must be at least 10 characters long.';
+      this.toastError('Issue description must be at least 10 characters long.');
       return;
     }
     if (!this.estimatedTime || this.estimatedTime <= 0 || this.estimatedTime > 1000) {
-      this.error = 'Estimated time must be between 1 and 1000 hours.';
+      this.toastError('Estimated time must be between 1 and 1000 hours.');
       return;
     }
     if (this.completedTime == null || this.completedTime < 0 || this.completedTime > 1000) {
-      this.error = 'Completed time must be between 0 and 1000 hours.';
+      this.toastError('Completed time must be between 0 and 1000 hours.');
       return;
     }
     if (!this.dueDate) {
-      this.error = 'Due date is required.';
+      this.toastError('Due date is required.');
       return;
     }
     if (!this.assignedTo) {
-      this.error = 'Please assign this issue to a user.';
+      this.toastError('Please assign this issue to a user.');
       return;
     }
 
@@ -250,17 +275,88 @@ export class IssueDetailComponent implements OnInit, OnChanges {
         assignedTo: this.assignedTo
       });
 
-      this.success = true;
       this.hasChanges = false;
+      this.editingField = null;
+      this.toastSuccess('Issue updated successfully!');
 
       setTimeout(() => {
         this.loadIssue();
-        this.isEditMode = false;
         this.issueUpdated.emit();
       }, 800);
 
     } catch (err: any) {
-      this.error = err?.message || 'Failed to update issue. Please try again.';
+      this.toastError(err?.message || 'Failed to update issue. Please try again.');
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  cancelChanges(): void {
+    if (this.hasChanges) {
+      if (confirm('You have unsaved changes. Do you want to discard them?')) {
+        this.resetForm();
+        this.editingField = null;
+        this.toastInfo('Changes discarded.');
+      }
+    } else {
+      this.editingField = null;
+    }
+  }
+
+  saveAndClose(): void {
+    this.error = '';
+    this.success = false;
+
+    if (!this.title.trim() || this.title.trim().length < 5) {
+      this.toastError('Issue title must be at least 5 characters long.');
+      return;
+    }
+    if (!this.description.trim() || this.description.trim().length < 10) {
+      this.toastError('Issue description must be at least 10 characters long.');
+      return;
+    }
+    if (!this.estimatedTime || this.estimatedTime <= 0 || this.estimatedTime > 1000) {
+      this.toastError('Estimated time must be between 1 and 1000 hours.');
+      return;
+    }
+    if (this.completedTime == null || this.completedTime < 0 || this.completedTime > 1000) {
+      this.toastError('Completed time must be between 0 and 1000 hours.');
+      return;
+    }
+    if (!this.dueDate) {
+      this.toastError('Due date is required.');
+      return;
+    }
+    if (!this.assignedTo) {
+      this.toastError('Please assign this issue to a user.');
+      return;
+    }
+
+    this.loading = true;
+    try {
+      this.issueService.updateIssue(this.issueId, {
+        title: this.title.trim(),
+        description: this.description.trim(),
+        state: this.state,
+        estimatedTime: this.estimatedTime!,
+        completedTime: this.completedTime!,
+        dueDate: this.dueDate,
+        assignedTo: this.assignedTo
+      });
+
+      this.hasChanges = false;
+      this.editingField = null;
+      this.toastSuccess('Issue updated — closing…');
+
+      setTimeout(() => {
+        this.issueUpdated.emit();
+        this.goToDashboard();
+        this.closed.emit();
+      }, 8000);
+
+      
+    } catch (err: any) {
+      this.toastError(err?.message || 'Failed to update issue. Please try again.');
     } finally {
       this.loading = false;
     }
@@ -279,19 +375,15 @@ export class IssueDetailComponent implements OnInit, OnChanges {
     this.hasChanges = false;
   }
 
-  markAsCompleted(): void {
-    this.state = 'completed';
-    this.completedTime = this.estimatedTime || 0;
-    this.checkForChanges();
-  }
-
   deleteIssue(): void {
+    this.showDeleteMenu = false;
     if (confirm(`Are you sure you want to delete issue ${this.issueId}?`)) {
       try {
         this.issueService.deleteIssue(this.issueId);
+        this.toastSuccess(`Issue ${this.issueId} deleted.`);
         this.deleted.emit();
       } catch (err: any) {
-        alert(err.message);
+        this.toastError(err?.message || 'Failed to delete issue.');
       }
     }
   }
@@ -322,5 +414,16 @@ export class IssueDetailComponent implements OnInit, OnChanges {
       case 'deleted':       return 'pi-trash';
       default:              return 'pi-clock';
     }
+  }
+
+  // Toast helpers
+  private toastSuccess(detail: string, summary = 'Success') {
+    this.messageService.add({ severity: 'success', summary, detail });
+  }
+  private toastError(detail: string, summary = 'Error') {
+    this.messageService.add({ severity: 'error', summary, detail });
+  }
+  private toastInfo(detail: string, summary = 'Info') {
+    this.messageService.add({ severity: 'info', summary, detail });
   }
 }

@@ -1,289 +1,280 @@
-<div class="w-full text-white min-h-screen">
-  <div *ngIf="loading && !issue" class="text-center py-12 backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-lg">
-    <p-progressSpinner [style]="{ width: '50px', height: '50px', margin: 'auto' }"></p-progressSpinner>
-    <p class="text-gray-300 mt-4">Loading issue...</p>
+<div class="w-full text-white">
+  
+  <p-toast position="top-right" styleClass="app-toast"></p-toast>
+
+  <div *ngIf="loading && !issue" class="text-center py-8 backdrop-blur-md bg-white/10 rounded-xl border border-white/20 shadow-lg">
+    <p-progressSpinner [style]="{ width: '40px', height: '40px', margin: 'auto' }"></p-progressSpinner>
+    <p class="text-gray-300 mt-3 text-sm">Loading issue...</p>
   </div>
 
-  <div *ngIf="notFound && !loading" class="text-center py-12 backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-lg">
-    <i class="pi pi-exclamation-circle text-5xl text-yellow-400 mb-4 block"></i>
-    <h2 class="text-2xl font-semibold text-white mb-2">Issue Not Found</h2>
-    <p class="text-gray-300 mb-8">The issue you're looking for doesn't exist or has been deleted.</p>
-    <button class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white px-6 py-2 rounded-xl shadow-lg hover:opacity-90 transition" (click)="goToDashboard()">Back to Dashboard</button>
+  <div *ngIf="notFound && !loading" class="text-center py-8 backdrop-blur-md bg-white/10 rounded-xl border border-white/20 shadow-lg">
+    <i class="pi pi-exclamation-circle text-4xl text-yellow-400 mb-3 block"></i>
+    <h2 class="text-xl font-semibold text-white mb-2">Issue Not Found</h2>
+    <p class="text-gray-300 text-sm mb-6">The issue you're looking for doesn't exist or has been deleted.</p>
+    <button class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white px-5 py-2 rounded-lg shadow-lg hover:opacity-90 transition text-sm" (click)="goToDashboard()">Back to Dashboard</button>
   </div>
 
-  <div *ngIf="permissionDenied && !loading && !isEditMode" class="text-center py-12 backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-lg">
-    <i class="pi pi-lock text-4xl text-red-500 mb-3"></i>
-    <h2 class="text-xl font-semibold text-white mb-2">Permission Denied</h2>
-    <p class="text-gray-300 mb-6">Only admins or the issue creator can edit this issue.</p>
-    <button class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white px-5 py-2 rounded-xl shadow-lg hover:opacity-90 transition" (click)="goToDashboard()">Back to Dashboard</button>
+  <div *ngIf="permissionDenied && !loading" class="fixed top-4 right-4 z-50 backdrop-blur-md bg-red-500/20 border border-red-400/30 rounded-lg p-3 shadow-lg animate-fade-in">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-lock text-xl text-red-400"></i>
+      <div>
+        <p class="font-semibold text-white text-sm">Permission Denied</p>
+        <p class="text-xs text-gray-300">Only admins or the issue creator can edit this issue.</p>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="issue && !notFound && !loading" class="space-y-6">
+  <div *ngIf="issue && !notFound && !loading" class="space-y-4">
     <div class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl shadow-2xl overflow-hidden">
-      <div class="p-6 border-b border-white/10">
-        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-          <div class="flex-1">
-            <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold flex items-center gap-2">
-              <i class="pi pi-tag"></i>
-              {{ issue.id }}
-            </p>
-            <h1 class="text-3xl font-bold text-white mb-3">{{ issue.title }}</h1>
-            <div class="flex items-center gap-2 text-sm text-gray-300">
-              <i class="pi pi-user text-gray-400"></i>
+      
+      <div class="p-4 border-b border-white/10">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex gap-2 items-center mb-2">
+              <p class="text-gray-400 text-[10px] uppercase tracking-wide font-semibold flex items-center gap-1">
+                <i class="pi pi-tag text-[10px]"></i>
+                {{ issue.id }}
+              </p>
+
+              <span 
+                [ngClass]="'px-2 py-0.5 text-[10px] rounded border flex items-center gap-1 font-semibold ' + getStateClass(issue.state)">
+                <i class="text-[10px]" [ngClass]="'pi ' + getStateIcon(issue.state)"></i>
+                {{ issue.state | titlecase }}
+              </span>
+
+              <span *ngIf="isOverdue()" class="px-2 py-0.5 text-[10px] rounded bg-red-400/20 text-red-300 border border-red-400/30 font-semibold flex items-center gap-1">
+                <i class="pi pi-exclamation-triangle text-[10px]"></i> Overdue
+              </span>
+            </div>
+
+            <div class="mb-2">
+              <h1 
+                *ngIf="!isEditing('title')" 
+                class="text-xl font-bold text-white cursor-pointer hover:text-blue-300 transition inline-flex items-center gap-2 group"
+                (click)="startEditing('title')">
+                {{ issue.title }}
+                <i *ngIf="canEditIssue()" class="pi pi-pencil text-xs opacity-50 group-hover:opacity-100 text-fray-300 transition"></i>
+              </h1>
+              <div *ngIf="isEditing('title')">
+                <input
+                  pInputText
+                  [(ngModel)]="title"
+                  (blur)="stopEditing()"
+                  (keyup.enter)="stopEditing()"
+                  (keyup.escape)="cancelChanges()"
+                  class="text-xl font-bold w-full bg-white/10 border border-white/20 rounded-lg px-2 py-1 focus:ring-2 focus:ring-purple-500"
+                  autofocus />
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 text-xs text-gray-300">
+              <i class="pi pi-user text-gray-400 text-[10px]"></i>
               <span>Created by <span class="font-semibold">{{ getUserName(issue.createdBy) }}</span></span>
               <span class="text-gray-500">•</span>
-              <span>{{ issue.createdAt | date:'medium' }}</span>
-            </div>
-          </div>
-          <div class="flex gap-3 flex-wrap">
-            <span [ngClass]="'px-4 py-2 rounded-lg border flex items-center gap-2 font-semibold ' + getStateClass(issue.state)">
-              <i [ngClass]="'pi ' + getStateIcon(issue.state)"></i>
-              {{ issue.state | titlecase }}
-            </span>
-            <span *ngIf="isOverdue()" class="px-4 py-2 rounded-lg bg-red-400/20 text-red-300 border border-red-400/30 font-semibold flex items-center gap-2">
-              <i class="pi pi-exclamation-triangle"></i> Overdue
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="border-b border-white/10">
-        <div class="flex px-6">
-          <button 
-            [class.border-b-2]="!isEditMode" 
-            [class.border-blue-400]="!isEditMode"
-            [class.text-white]="!isEditMode"
-            [class.text-gray-400]="isEditMode"
-            class="px-4 py-3 font-semibold transition hover:text-white"
-            (click)="exitEditMode()">
-            <i class="pi pi-eye mr-2"></i>Details
-          </button>
-          <button 
-            *ngIf="canEditIssue()"
-            [class.border-b-2]="isEditMode" 
-            [class.border-blue-400]="isEditMode"
-            [class.text-white]="isEditMode"
-            [class.text-gray-400]="!isEditMode"
-            class="px-4 py-3 font-semibold transition hover:text-white"
-            (click)="enterEditMode()">
-            <i class="pi pi-pencil mr-2"></i>Edit
-          </button>
-        </div>
-      </div>
-
-      <div class="p-6">
-        <div class="two-col grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-stretch">
-          <div class="left-col h-full space-y-6">
-            <div *ngIf="!isEditMode" class="space-y-6">
-              <div class="mb-6 pb-6 border-b border-white/10">
-                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Description</h3>
-                <p class="text-gray-200 leading-relaxed whitespace-pre-wrap">{{ issue.description }}</p>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 pb-6 border-b border-white/10">
-                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold flex items-center gap-2">
-                    <i class="pi pi-user"></i>Assigned To
-                  </p>
-                  <p class="text-white font-medium text-lg">{{ getUserName(issue.assignedTo) }}</p>
-                </div>
-                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold flex items-center gap-2">
-                    <i class="pi pi-clock"></i>Last Updated
-                  </p>
-                  <p class="text-white font-medium text-lg">{{ issue.updatedAt | date:'medium' }}</p>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold">Estimated Time</p>
-                  <p class="text-2xl font-bold text-blue-300">{{ issue.estimatedTime }}h</p>
-                </div>
-                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold">Completed Time</p>
-                  <p class="text-2xl font-bold text-green-300">{{ issue.completedTime }}h</p>
-                </div>
-                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold">Delay/Effort</p>
-                  <p [ngClass]="calculateDelay() > 0 ? 'text-red-300' : 'text-green-300'" class="text-2xl font-bold">
-                    {{ calculateDelay() > 0 ? '+' : '' }}{{ calculateDelay() }}h
-                  </p>
-                </div>
-                <div class="bg-white/5 rounded-lg p-4 border border-white/10" [ngClass]="isOverdue() ? 'border-red-400/50' : ''">
-                  <p class="text-gray-400 text-xs uppercase tracking-wide mb-2 font-semibold">Due Date</p>
-                  <p [ngClass]="isOverdue() ? 'text-red-300' : 'text-white'" class="text-lg font-bold">
-                    {{ issue.dueDate | date:'mediumDate' }}
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap gap-3 pt-4 border-t border-white/10">
-                <button 
-                  *ngIf="canDeleteIssue()"
-                  class="px-6 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg font-semibold transition flex items-center gap-2 text-red-200"
-                  (click)="deleteIssue()">
-                  <i class="pi pi-trash"></i> Delete Issue
-                </button>
-                <button 
-                  class="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-semibold transition flex items-center gap-2 ml-auto text-neutral-200"
-                  (click)="goBack()">
-                  <i class="pi pi-arrow-left"></i> Back
-                </button>
-              </div>
-            </div>
-
-            <div *ngIf="isEditMode" class="form-wrap h-full">
-              <p-message *ngIf="success" severity="success" text="Issue updated successfully!" styleClass="mb-6 w-full"></p-message>
-              <p-message *ngIf="error" severity="error" [text]="error" styleClass="mb-6 w-full"></p-message>
-
-              <div *ngIf="hasChanges" class="bg-yellow-400/10 border border-yellow-500/30 rounded-lg p-4 mb-6 flex gap-3">
-                <i class="pi pi-exclamation-triangle text-yellow-400 text-xl"></i>
-                <div>
-                  <p class="font-semibold text-yellow-300">Unsaved Changes</p>
-                  <p class="text-gray-200 text-sm">Click "Update Issue" to save them.</p>
-                </div>
-              </div>
-
-              <form (ngSubmit)="onSubmit($event)" class="space-y-6 text-white h-full" novalidate>
-                <div>
-                  <label class="block text-sm font-semibold mb-2">Title</label>
-                  <input
-                    pInputText
-                    [(ngModel)]="title"
-                    (input)="onInputChange()"
-                    name="title"
-                    placeholder="Enter issue title"
-                    class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 placeholder-gray-400"
-                    required />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold mb-2">Description</label>
-                  <textarea
-                    pInputTextarea
-                    [(ngModel)]="description"
-                    (input)="onInputChange()"
-                    name="description"
-                    rows="5"
-                    placeholder="Issue description"
-                    class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 placeholder-gray-400"
-                    required>
-                  </textarea>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label class="block text-sm font-semibold mb-2">State</label>
-                    <p-dropdown
-                      [(ngModel)]="state"
-                      (onChange)="onInputChange()"
-                      name="state"
-                      [options]="stateOptions"
-                      optionLabel="label"
-                      optionValue="value"
-                      styleClass="w-full glass-dropdown"
-                      [disabled]="loading">
-                    </p-dropdown>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold mb-2">Assigned To</label>
-                    <p-dropdown
-                      [(ngModel)]="assignedTo"
-                      (onChange)="onInputChange()"
-                      name="assignedTo"
-                      [options]="userOptions"
-                      optionLabel="label"
-                      optionValue="value"
-                      styleClass="w-full glass-dropdown"
-                      [disabled]="loading">
-                    </p-dropdown>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label class="block text-sm font-semibold mb-2">Estimated Time (hrs)</label>
-                    <p-inputNumber
-                      [(ngModel)]="estimatedTime"
-                      (onInput)="onInputChange()"
-                      name="estimatedTime"
-                      [min]="1"
-                      [max]="1000"
-                      styleClass="w-full glass-input"
-                      [disabled]="loading">
-                    </p-inputNumber>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold mb-2">Completed Time (hrs)</label>
-                    <p-inputNumber
-                      [(ngModel)]="completedTime"
-                      (onInput)="onInputChange()"
-                      name="completedTime"
-                      [min]="0"
-                      [max]="1000"
-                      styleClass="w-full glass-input"
-                      [disabled]="loading">
-                    </p-inputNumber>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold mb-2">Due Date</label>
-                  <p-calendar
-                    [(ngModel)]="dueDate"
-                    name="dueDate"
-                    (onSelect)="onInputChange()"
-                    [showIcon]="true"
-                    styleClass="w-full glass-input"
-                    [disabled]="loading">
-                  </p-calendar>
-                </div>
-
-                <div class="bg-blue-500/10 border border-blue-400/20 rounded-lg p-4 text-sm">
-                  <i class="pi pi-info-circle text-blue-400 mr-2"></i>
-                  All updates will be logged with timestamps for tracking.
-                </div>
-
-                <div class="flex flex-wrap gap-4 pt-6 border-t border-white/10">
-                  <button 
-                    type="submit" 
-                    class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white shadow-lg hover:opacity-90 transition px-6 py-2 rounded-xl font-semibold" 
-                    [disabled]="loading || !hasChanges">
-                    <i class="pi pi-check mr-2"></i>Update Issue
-                  </button>
-                  <button 
-                    type="button" 
-                    class="px-6 py-2 rounded-xl bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 transition font-semibold" 
-                    (click)="resetForm()">
-                    <i class="pi pi-refresh mr-2"></i>Reset
-                  </button>
-                  <button 
-                    type="button" 
-                    class="px-6 py-2 rounded-xl bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 transition font-semibold" 
-                    (click)="markAsCompleted()">
-                    <i class="pi pi-check-circle mr-2"></i>Mark Completed
-                  </button>
-                  <button 
-                    type="button" 
-                    class="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition ms-auto font-semibold" 
-                    (click)="exitEditMode()">
-                    <i class="pi pi-times mr-2"></i>Cancel
-                  </button>
-                </div>
-              </form>
+              <span>{{ issue.createdAt | date:'short' }}</span>
             </div>
           </div>
 
         
-          <aside class="right-col lg:sticky lg:top-4 h-full space-y-4">
-            <div class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl shadow-2xl overflow-hidden h-fit">
-              <div class="px-4 py-3 border-b border-white/10">
-                <h4 class="text-sm font-semibold text-white">Details</h4>
+          <div class="flex items-center gap-2 flex-shrink-0">
+
+            
+            <button 
+              class="bg-gradient-to-r from-pink-600 via-purple-700 to-blue-800 text-white px-4 py-2 rounded-lg shadow-lg hover:opacity-90 transition font-semibold text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              (click)="saveAndClose()"
+              [disabled]="!hasChanges || loading">
+              <i class="pi pi-check text-xs"></i> Save & Close
+            </button>
+
+            
+            <button 
+              *ngIf="hasChanges"
+              class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/20 transition font-semibold text-sm flex items-center gap-2"
+              (click)="cancelChanges()">
+              <i class="pi pi-times text-xs"></i> Cancel
+            </button>
+
+            <div class="relative" *ngIf="canDeleteIssue()">
+              <button 
+                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition flex items-center justify-center"
+                (click)="toggleDeleteMenu()">
+                <i class="pi pi-ellipsis-v text-sm"></i>
+              </button>
+              <div *ngIf="showDeleteMenu" class="absolute right-0 top-full mt-1 z-50 backdrop-blur-lg bg-gray-900/95 border border-white/20 rounded-lg shadow-xl overflow-hidden min-w-[140px]">
+                <button 
+                  class="w-full px-3 py-2 text-left text-sm hover:bg-white/10 transition flex items-center gap-2 text-red-300"
+                  (click)="deleteIssue()">
+                  <i class="pi pi-trash text-xs"></i> Delete Issue
+                </button>
               </div>
-              <div class="p-4 space-y-3 text-sm">
+            </div>
+
+           
+            <button 
+              class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition flex items-center justify-center"
+              (click)="closeModal()">
+              <i class="pi pi-times text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <div class="two-col grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 items-stretch">
+          <div class="left-col h-full space-y-4">
+            
+            <div class="pb-4 border-b border-white/10">
+              <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Description</h3>
+              <p 
+                *ngIf="!isEditing('description')"
+                class="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap cursor-pointer hover:bg-white/5 p-2 rounded-lg transition group relative"
+                (click)="startEditing('description')">
+                {{ issue.description }}
+                <i *ngIf="canEditIssue()" class="pi pi-pencil text-xs opacity-50 group-hover:opacity-100 text-fray-300 transition absolute top-1 right-1"></i>
+              </p>
+              <div *ngIf="isEditing('description')">
+                <textarea
+                  pInputTextarea
+                  [(ngModel)]="description"
+                  (blur)="stopEditing()"
+                  rows="5"
+                  class="w-full text-sm bg-white/10 border border-white/20 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500"
+                  autofocus>
+                </textarea>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pb-4 border-b border-white/10">
+              
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10 cursor-pointer hover:bg-white/10 transition relative group"
+                   (click)="startEditing('assignedTo')">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold flex items-center gap-1">
+                  <i class="pi pi-user text-[10px]"></i>Assigned To
+                  <i *ngIf="canEditIssue()" class="pi pi-pencil text-[8px] opacity-50 group-hover:opacity-100 text-fray-300 transition ml-auto"></i>
+                </p>
+                <p *ngIf="!isEditing('assignedTo')" class="text-white font-medium text-sm">{{ getUserName(issue.assignedTo) }}</p>
+                <div *ngIf="isEditing('assignedTo')" class="mt-1" (click)="$event.stopPropagation()">
+                  <p-dropdown
+                    [(ngModel)]="assignedTo"
+                    (onChange)="onInputChange(); stopEditing()"
+                    [options]="userOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="w-full text-sm"
+                    [autoDisplayFirst]="false">
+                  </p-dropdown>
+                </div>
+              </div>
+
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10 cursor-pointer hover:bg-white/10 transition relative group"
+                   (click)="startEditing('state')">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold flex items-center gap-1">
+                  State
+                  <i *ngIf="canEditIssue()" class="pi pi-pencil text-[8px] opacity-50 group-hover:opacity-100 text-fray-300 transition ml-auto"></i>
+                </p>
+                <div *ngIf="!isEditing('state')" class="flex items-center gap-2">
+                  <span [ngClass]="'px-2 py-0.5 text-[10px] rounded border flex items-center gap-1 font-semibold ' + getStateClass(issue.state)">
+                    <i class="text-[10px]" [ngClass]="'pi ' + getStateIcon(issue.state)"></i>
+                    {{ issue.state | titlecase }}
+                  </span>
+                </div>
+                <div *ngIf="isEditing('state')" class="mt-1" (click)="$event.stopPropagation()">
+                  <p-dropdown
+                    [(ngModel)]="state"
+                    (onChange)="onInputChange(); stopEditing()"
+                    [options]="stateOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="w-full text-sm"
+                    [autoDisplayFirst]="false">
+                  </p-dropdown>
+                </div>
+              </div>
+
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold flex items-center gap-1">
+                  <i class="pi pi-clock text-[10px]"></i>Last Updated
+                </p>
+                <p class="text-white font-medium text-sm">{{ issue.updatedAt | date:'short' }}</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10 cursor-pointer hover:bg-white/10 transition relative group"
+                   (click)="startEditing('estimatedTime')">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold flex items-center gap-1">
+                  Estimated
+                  <i *ngIf="canEditIssue()" class="pi pi-pencil text-[8px] opacity-50 group-hover:opacity-100 text-fray-300 transition ml-auto"></i>
+                </p>
+                <p *ngIf="!isEditing('estimatedTime')" class="text-xl font-bold text-blue-300">{{ issue.estimatedTime }}h</p>
+                <div *ngIf="isEditing('estimatedTime')" (click)="$event.stopPropagation()">
+                  <p-inputNumber
+                    [(ngModel)]="estimatedTime"
+                    (onBlur)="stopEditing()"
+                    [min]="1"
+                    [max]="1000"
+                    suffix=" h"
+                    styleClass="w-full text-sm">
+                  </p-inputNumber>
+                </div>
+              </div>
+
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10 cursor-pointer hover:bg-white/10 transition relative group"
+                   (click)="startEditing('completedTime')">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold flex items-center gap-1">
+                  Completed
+                  <i *ngIf="canEditIssue()" class="pi pi-pencil text-[8px] opacity-50 group-hover:opacity-100 text-fray-300 transition ml-auto"></i>
+                </p>
+                <p *ngIf="!isEditing('completedTime')" class="text-xl font-bold text-green-300">{{ issue.completedTime }}h</p>
+                <div *ngIf="isEditing('completedTime')" (click)="$event.stopPropagation()">
+                  <p-inputNumber
+                    [(ngModel)]="completedTime"
+                    (onBlur)="stopEditing()"
+                    [min]="0"
+                    [max]="1000"
+                    suffix=" h"
+                    styleClass="w-full text-sm">
+                  </p-inputNumber>
+                </div>
+              </div>
+
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold">Delay/Effort</p>
+                <p [ngClass]="calculateDelay() > 0 ? 'text-red-300' : 'text-green-300'" class="text-xl font-bold">
+                  {{ calculateDelay() > 0 ? '+' : '' }}{{ calculateDelay() }}h
+                </p>
+              </div>
+
+              <div class="bg-white/5 rounded-lg p-3 border border-white/10 cursor-pointer hover:bg-white/10 transition relative group"
+                   [ngClass]="isOverdue() ? 'border-red-400/50' : ''"
+                   (click)="startEditing('dueDate')">
+                <p class="text-gray-400 text-[10px] uppercase tracking-wide mb-1 font-semibold flex items-center gap-1">
+                  Due Date
+                  <i *ngIf="canEditIssue()" class="pi pi-pencil text-[8px] opacity-50 group-hover:opacity-100 text-fray-300 transition ml-auto"></i>
+                </p>
+                <p *ngIf="!isEditing('dueDate')" [ngClass]="isOverdue() ? 'text-red-300' : 'text-white'" class="text-sm font-bold">
+                  {{ issue.dueDate | date:'MMM d, y' }}
+                </p>
+                <div *ngIf="isEditing('dueDate')" (click)="$event.stopPropagation()">
+                  <p-calendar
+                    [(ngModel)]="dueDate"
+                    (onSelect)="onInputChange(); stopEditing()"
+                    [showIcon]="true"
+                    [minDate]="minDueDate"
+                    styleClass="w-full text-sm">
+                  </p-calendar>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="right-col lg:sticky lg:top-4 h-full space-y-3">
+            <div class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-lg shadow-2xl overflow-hidden h-fit">
+              <div class="px-3 py-2 border-b border-white/10">
+                <h4 class="text-xs font-semibold text-white">Details</h4>
+              </div>
+              <div class="p-3 space-y-2 text-xs">
                 <div class="flex items-center justify-between">
                   <span class="text-gray-400">Remaining Work</span>
                   <span class="font-semibold text-white">
@@ -305,40 +296,39 @@
               </div>
             </div>
 
-       
-            <div class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl shadow-2xl overflow-hidden activity-panel flex flex-col">
-              <div class="px-4 py-3 border-b border-white/10">
-                <h4 class="text-sm font-semibold text-white flex items-center gap-2">
-                  <i class="pi pi-clock text-blue-400"></i> Activity Log
+            <div class="backdrop-blur-lg bg-white/10 border border-white/20 rounded-lg shadow-2xl overflow-hidden activity-panel flex flex-col">
+              <div class="px-3 py-2 border-b border-white/10">
+                <h4 class="text-xs font-semibold text-white flex items-center gap-1">
+                  <i class="pi pi-clock text-blue-400 text-xs"></i> Activity Log
                 </h4>
               </div>
 
-              <div class="p-4 grow overflow-auto">
-                <div *ngIf="activityLogs && activityLogs.length > 0; else noActivity" class="space-y-4">
-                  <div *ngFor="let log of activityLogs" class="bg-white/5 border border-white/10 rounded-lg p-4 flex gap-4 hover:bg-white/10 transition">
+              <div class="p-3 grow overflow-auto">
+                <div *ngIf="activityLogs && activityLogs.length > 0; else noActivity" class="space-y-2">
+                  <div *ngFor="let log of activityLogs" class="bg-white/5 border border-white/10 rounded-lg p-2 flex gap-2 hover:bg-white/10 transition">
                     <div class="flex-shrink-0">
-                      <span class="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20">
-                        <i [ngClass]="'pi ' + getActivityIcon(log.action) + ' text-blue-400'"></i>
+                      <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/10 border border-white/20">
+                        <i [ngClass]="'pi ' + getActivityIcon(log.action) + ' text-blue-400 text-[10px]'"></i>
                       </span>
                     </div>
-                    <div class="flex-1">
-                      <div class="flex items-center justify-between flex-wrap gap-2">
-                        <p class="font-semibold text-white">{{ getActivityActionText(log.action) }}</p>
-                        <p class="text-xs text-gray-400">{{ log.timestamp | date:'medium' }}</p>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between flex-wrap gap-1">
+                        <p class="font-semibold text-white text-xs">{{ getActivityActionText(log.action) }}</p>
+                        <p class="text-[10px] text-gray-400">{{ log.timestamp | date:'short' }}</p>
                       </div>
-                      <p class="text-sm text-gray-300 mt-1">by <span class="font-medium">{{ log.userName }}</span></p>
+                      <p class="text-xs text-gray-300 mt-0.5">by <span class="font-medium">{{ log.userName }}</span></p>
 
-                      <div *ngIf="log.changes && log.changes.length > 0" class="mt-3 space-y-1">
-                        <p *ngFor="let change of log.changes" class="text-sm text-gray-300 flex items-start gap-2">
-                          <i class="pi pi-arrow-right text-blue-400 text-xs mt-1"></i>
+                      <div *ngIf="log.changes && log.changes.length > 0" class="mt-1 space-y-1">
+                        <p *ngFor="let change of log.changes" class="text-[11px] text-gray-300 flex items-start gap-1">
+                          <i class="pi pi-arrow-right text-blue-400 text-[9px] mt-0.5"></i>
                           <span class="flex-1">
                             <span class="font-medium text-white">{{ change.field | titlecase }}:</span>
-                            <span class="text-red-300 line-through mx-2">
-                              {{ change.field === 'dueDate' ? (change.oldValue | date:'MMM d, y, h:mm a') : change.oldValue }}
+                            <span class="text-red-300 line-through mx-1">
+                              {{ change.field === 'dueDate' ? (change.oldValue | date:'MMM d, y') : change.oldValue }}
                             </span>
-                            <i class="pi pi-arrow-right text-gray-500 mx-1"></i>
+                            <i class="pi pi-arrow-right text-gray-500 mx-0.5 text-[8px]"></i>
                             <span class="text-green-300 font-medium">
-                              {{ change.field === 'dueDate' ? (change.newValue | date:'MMM d, y, h:mm a') : change.newValue }}
+                              {{ change.field === 'dueDate' ? (change.newValue | date:'MMM d, y') : change.newValue }}
                             </span>
                           </span>
                         </p>
@@ -348,10 +338,10 @@
                 </div>
 
                 <ng-template #noActivity>
-                  <div class="text-center py-8">
-                    <i class="pi pi-inbox text-3xl text-gray-500 mb-2 block"></i>
-                    <p class="text-gray-400">No activity yet</p>
-                    <p class="text-gray-500 text-xs mt-1">Activity will appear here as changes are made</p>
+                  <div class="text-center py-6">
+                    <i class="pi pi-inbox text-2xl text-gray-500 mb-2 block"></i>
+                    <p class="text-gray-400 text-xs">No activity yet</p>
+                    <p class="text-gray-500 text-[10px] mt-1">Activity will appear here as changes are made</p>
                   </div>
                 </ng-template>
               </div>

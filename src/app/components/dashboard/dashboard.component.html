@@ -1,6 +1,6 @@
 <p-card styleClass="surface-card border-none">
-  <div class="flex flex-col gap-4">
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+  <div class="flex flex-col gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
       <p-card styleClass="kpi card-item">
         <div class="kpi-title">Total</div>
         <div class="kpi-value">{{ kpiTotal() }}</div>
@@ -21,7 +21,7 @@
   </div>
 </p-card>
 
-<div class="custom-tabview-header mt-4">
+<div class="custom-tabview-header mt-3">
   <div class="tab-buttons">
     <button
       class="tab-button"
@@ -48,9 +48,9 @@
     <button
       pButton
       (click)="openCreateModal()"
-      class="text-white font-medium tracking-wide bottom-0 p-2
+      class="text-white font-medium tracking-wide p-2.5
              bg-gradient-to-r from-fuchsia-500 via-violet-700 to-blue-700
-             shadow-lg backdrop-blur-md text-sm rounded-lg
+             shadow-lg backdrop-blur-md text-xs rounded-lg
              hover:scale-[1.03] hover:shadow-fuchsia-500/40
              transition-all duration-300 active:scale-95"
     >
@@ -59,9 +59,9 @@
   </div>
 </div>
 
-<div *ngIf="showFilterToolbar()" class="filter-toolbar mb-4 p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="flex items-center gap-3">
+<div *ngIf="showFilterToolbar()" class="filter-toolbar mb-3 p-3 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)]">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+    <div class="flex items-center gap-2">
       <span class="relative flex-grow">
         <input
           pInputText
@@ -69,13 +69,13 @@
           placeholder="Search by Title, ID"
           [ngModel]="search()"
           (ngModelChange)="search.set($event)"
-          class="w-full p-2"
+          class="w-full p-1.5 text-sm"
         />
-        <i class="pi pi-search absolute right-4 top-3"></i>
+        <i class="pi pi-search absolute right-3 top-3 text-gray-400 text-xs"></i>
       </span>
     </div>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-1">
       <p-multiSelect
         [options]="stateOptions"
         [ngModel]="selectedStates()"
@@ -84,12 +84,12 @@
         optionLabel="label"
         optionValue="value"
         [showToggleAll]="true"
-        class="custom-multiselect"
+        class="custom-multiselect text-sm"
         styleClass="w-full"
       ></p-multiSelect>
     </div>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-1">
       <p-multiSelect
         [options]="assigneeOptions"
         [ngModel]="selectedAssignees()"
@@ -98,14 +98,11 @@
         optionLabel="label"
         optionValue="value"
         [showToggleAll]="true"
-        class="custom-multiselect"
+        class="custom-multiselect text-sm"
         styleClass="w-full"
       ></p-multiSelect>
     </div>
-    
-  </div>
 
-  <div class="mt-3">
     <p-checkbox
       [ngModel]="myOnly()"
       (ngModelChange)="myOnly.set($event)"
@@ -117,7 +114,7 @@
 </div>
 
 <div class="tab-content">
-  <div *ngIf="activeTab() === 'board'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+  <div *ngIf="activeTab() === 'board'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
     <p-card
       styleClass="kanban-col"
       cdkDropList
@@ -127,9 +124,9 @@
       (cdkDropListDropped)="drop($event, 'new')"
     >
       <div class="col-title">New</div>
-      <div class="space-y-3 min-h-[100px]">
+      <div class="space-y-2 min-h-[80px]">
         <div
-          class="card-item flex flex-col gap-3"
+          class="card-item flex flex-col gap-2"
           *ngFor="let i of colBacklog(); trackBy: trackById"
           cdkDrag
         >
@@ -138,25 +135,26 @@
             <p-tag
               [severity]="stateSeverity(i.state)"
               [value]="i.state | titlecase"
+              styleClass="text-[10px] px-2 py-0.5"
             ></p-tag>
           </div>
 
           <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
-            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
-            <div class="text-neutral-300 text-xs">{{ i.description }}</div>
+            <div class="text-white text-xs font-medium hover:text-blue-300 transition">{{ i.title }}</div>
+            <div class="text-neutral-300 text-[11px] line-clamp-2">{{ i.description }}</div>
           </div>
 
-          <div class="flex flex-col gap-1 text-xs text-neutral-200">
-            <div class="flex items-center gap-1 ">
-              <i class="pi pi-user text-xs"></i>
+          <div class="flex flex-col gap-0.5 text-[10px] text-neutral-200">
+            <div class="flex items-center gap-1">
+              <i class="pi pi-user text-[9px]"></i>
               <span>Created by: {{ createdByName(i.createdBy) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-user-plus text-xs"></i>
+              <i class="pi pi-user-plus text-[9px]"></i>
               <span>Assigned to: {{ assigneeName(i.assignedTo) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-calendar text-xs"></i>
+              <i class="pi pi-calendar text-[9px]"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
           </div>
@@ -173,33 +171,33 @@
       (cdkDropListDropped)="drop($event, 'in-progress')"
     >
       <div class="col-title">In Progress</div>
-      <div class="space-y-3 min-h-[100px]">
+      <div class="space-y-2 min-h-[80px]">
         <div
-          class="card-item flex flex-col gap-3"
+          class="card-item flex flex-col gap-2"
           *ngFor="let i of colProgress(); trackBy: trackById"
           cdkDrag
         >
           <div class="flex justify-between items-center">
             <div class="id">{{ i.id }}</div>
-            <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
+            <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase" styleClass="text-[10px] px-2 py-0.5"></p-tag>
           </div>
 
           <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
-            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
-            <div class="text-neutral-300 text-xs">{{ i.description }}</div>
+            <div class="text-white text-xs font-medium hover:text-blue-300 transition">{{ i.title }}</div>
+            <div class="text-neutral-300 text-[11px] line-clamp-2">{{ i.description }}</div>
           </div>
 
-          <div class="flex flex-col gap-1 text-xs text-neutral-200">
+          <div class="flex flex-col gap-0.5 text-[10px] text-neutral-200">
             <div class="flex items-center gap-1">
-              <i class="pi pi-user text-xs"></i>
+              <i class="pi pi-user text-[9px]"></i>
               <span>Created by: {{ createdByName(i.createdBy) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-user-plus text-xs"></i>
+              <i class="pi pi-user-plus text-[9px]"></i>
               <span>Assigned to: {{ assigneeName(i.assignedTo) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-calendar text-xs"></i>
+              <i class="pi pi-calendar text-[9px]"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
           </div>
@@ -216,33 +214,33 @@
       (cdkDropListDropped)="drop($event, 'completed')"
     >
       <div class="col-title">Done</div>
-      <div class="space-y-3 min-h-[100px]">
+      <div class="space-y-2 min-h-[80px]">
         <div
-          class="card-item flex flex-col gap-3"
+          class="card-item flex flex-col gap-2"
           *ngFor="let i of colDone(); trackBy: trackById"
           cdkDrag
         >
           <div class="flex justify-between items-center">
             <div class="id">{{ i.id }}</div>
-            <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
+            <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase" styleClass="text-[10px] px-2 py-0.5"></p-tag>
           </div>
 
           <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
-            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
-            <div class="text-neutral-300 text-xs">{{ i.description }}</div>
+            <div class="text-white text-xs font-medium hover:text-blue-300 transition">{{ i.title }}</div>
+            <div class="text-neutral-300 text-[11px] line-clamp-2">{{ i.description }}</div>
           </div>
 
-          <div class="flex flex-col gap-1 text-xs text-neutral-200">
+          <div class="flex flex-col gap-0.5 text-[10px] text-neutral-200">
             <div class="flex items-center gap-1">
-              <i class="pi pi-user text-xs"></i>
+              <i class="pi pi-user text-[9px]"></i>
               <span>Created by: {{ createdByName(i.createdBy) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-user-plus text-xs"></i>
+              <i class="pi pi-user-plus text-[9px]"></i>
               <span>Assigned to: {{ assigneeName(i.assignedTo) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-calendar text-xs"></i>
+              <i class="pi pi-calendar text-[9px]"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
           </div>
@@ -259,33 +257,33 @@
       (cdkDropListDropped)="drop($event, 'blocked')"
     >
       <div class="col-title">Blocked</div>
-      <div class="space-y-3 min-h-[100px]">
+      <div class="space-y-2 min-h-[80px]">
         <div
-          class="card-item flex flex-col gap-3"
+          class="card-item flex flex-col gap-2"
           *ngFor="let i of colBlocked(); trackBy: trackById"
           cdkDrag
         >
           <div class="flex justify-between items-center">
             <div class="id">{{ i.id }}</div>
-            <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
+            <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase" styleClass="text-[10px] px-2 py-0.5"></p-tag>
           </div>
 
           <div class="flex flex-col gap-1 cursor-pointer" (click)="openIssueDetail(i.id)">
-            <div class="text-white text-sm font-medium hover:text-blue-300 transition">{{ i.title }}</div>
-            <div class="text-neutral-300 text-xs">{{ i.description }}</div>
+            <div class="text-white text-xs font-medium hover:text-blue-300 transition">{{ i.title }}</div>
+            <div class="text-neutral-300 text-[11px] line-clamp-2">{{ i.description }}</div>
           </div>
 
-          <div class="flex flex-col gap-1 text-xs text-neutral-200">
+          <div class="flex flex-col gap-0.5 text-[10px] text-neutral-200">
             <div class="flex items-center gap-1">
-              <i class="pi pi-user text-xs"></i>
+              <i class="pi pi-user text-[9px]"></i>
               <span>Created by: {{ createdByName(i.createdBy) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-user-plus text-xs"></i>
+              <i class="pi pi-user-plus text-[9px]"></i>
               <span>Assigned to: {{ assigneeName(i.assignedTo) }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <i class="pi pi-calendar text-xs"></i>
+              <i class="pi pi-calendar text-[9px]"></i>
               <span>Created: {{ i.createdAt | date: 'MMM d, y' }}</span>
             </div>
           </div>
@@ -304,26 +302,25 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th style="width: 110px">ID</th>
+            <th style="width: 90px">ID</th>
             <th>Title</th>
-            <th style="width: 160px">State</th>
-            <th style="width: 220px">Assignee</th>
-            <th style="width: 120px">Est.</th>
-            <th style="width: 140px">Due</th>
+            <th style="width: 130px">State</th>
+            <th style="width: 180px">Assignee</th>
+            <th style="width: 90px">Est.</th>
+            <th style="width: 110px">Due</th>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-i>
           <tr class="cursor-pointer hover:bg-white/5 transition" (click)="openIssueDetail(i.id)">
-            <td>{{ i.id }}</td>
-            <td class="font-medium hover:text-blue-300">{{ i.title }}</td>
+            <td class="text-xs">{{ i.id }}</td>
+            <td class="font-medium hover:text-blue-300 text-xs">{{ i.title }}</td>
             <td>
-              <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase"></p-tag>
+              <p-tag [severity]="stateSeverity(i.state)" [value]="i.state | titlecase" styleClass="text-[10px] px-2 py-0.5"></p-tag>
             </td>
-            <td>{{ assigneeName(i.assignedTo) }}</td>
-            <td>{{ i.estimatedTime }}h</td>
-            <td>{{ i.dueDate | date: 'MM/dd/yy' }}</td>
-            <td></td>
+            <td class="text-xs">{{ assigneeName(i.assignedTo) }}</td>
+            <td class="text-xs">{{ i.estimatedTime }}h</td>
+            <td class="text-xs">{{ i.dueDate | date: 'MM/dd/yy' }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -337,22 +334,24 @@
   [style]="{ width: '90vw', maxWidth: '1000px' }"
   [draggable]="false"
   [resizable]="false"
-  [closable]="true"
+  [closable]="false"
+  [showHeader]="false"
   styleClass="custom-modal"
 >
   <app-create-issue
     (issueCreated)="onIssueCreated()"
-    (cancelled)="closeCreateModal()"
+    (closed)="closeCreateModal()"
   ></app-create-issue>
 </p-dialog>
 
 <p-dialog
   [(visible)]="showDetailModal"
   [modal]="true"
-  [style]="{ width: '95vw', maxWidth: '1400px' }"
+  [style]="{ width: '95vw', maxWidth: '1200px' }"
   [draggable]="false"
   [resizable]="false"
-  [closable]="true"
+  [closable]="false"
+  [showHeader]="false"
   styleClass="custom-modal"
 >
   <app-issue-detail 

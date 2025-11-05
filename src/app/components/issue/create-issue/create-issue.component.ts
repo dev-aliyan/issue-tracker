@@ -11,8 +11,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-create-issue',
@@ -28,36 +28,38 @@ import { ToastModule } from 'primeng/toast';
     CalendarModule,
     InputNumberModule,
     ButtonModule,
-    MessageModule,
-    ToastModule,
+    ToastModule, // keep ToastModule
   ],
+  providers: [MessageService], // provide the service (or provide it once at a higher level)
 })
 export class CreateIssueComponent implements OnInit {
   @Output() issueCreated = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+  @Output() closed = new EventEmitter<void>();
 
   title = '';
   description = '';
   assignedTo = '';
   estimatedTime: number | null = null;
   dueDate: Date | null = null;
+  minDueDate!: Date;
 
   allUsers: User[] = [];
   currentUser: User | null = null;
   loading = false;
-  error = '';
-  success = false;
+  showMenu = false;
   userOptions: { label: string; value: string }[] = [];
 
   constructor(
     private issueService: IssueService,
-    private userService: UserService
+    private userService: UserService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.userService.getCurrentUser();
     if (!this.currentUser) {
-      this.error = 'No user logged in';
+      this.toastError('No user logged in');
       return;
     }
 
@@ -67,8 +69,8 @@ export class CreateIssueComponent implements OnInit {
       value: user.id,
     }));
 
-    // Default assignee = self (unless admin chooses)
     this.assignedTo = this.currentUser.id;
+    this.minDueDate = this.getMinDueDate();
   }
 
   getMinDueDate(): Date {
@@ -77,29 +79,33 @@ export class CreateIssueComponent implements OnInit {
     return tomorrow;
   }
 
+  toggleMenu(): void {
+    this.showMenu = !this.showMenu;
+  }
+
   onSubmit(event?: Event): void {
     event?.preventDefault();
-    this.error = '';
-    this.success = false;
+    this.showMenu = false;
 
+    // validations -> toast errors
     if (!this.title.trim() || this.title.length < 5) {
-      this.error = 'Title must be at least 5 characters.';
+      this.toastError('Title must be at least 5 characters.');
       return;
     }
     if (!this.description.trim() || this.description.length < 10) {
-      this.error = 'Description must be at least 10 characters.';
+      this.toastError('Description must be at least 10 characters.');
       return;
     }
     if (!this.estimatedTime || this.estimatedTime <= 0) {
-      this.error = 'Estimated time must be greater than 0.';
+      this.toastError('Estimated time must be greater than 0.');
       return;
     }
     if (!this.dueDate || new Date(this.dueDate) <= new Date()) {
-      this.error = 'Select a valid future due date.';
+      this.toastError('Select a valid future due date.');
       return;
     }
     if (this.currentUser?.role === 'admin' && !this.assignedTo) {
-      this.error = 'Please select an assignee.';
+      this.toastError('Please select an assignee.');
       return;
     }
 
@@ -114,20 +120,29 @@ export class CreateIssueComponent implements OnInit {
         assignedTo: this.assignedTo,
       });
 
-      this.success = true;
-      this.resetForm();
+      this.toastSuccess('✅ Issue created successfully!');
+      this.resetFormData();
 
       setTimeout(() => {
         this.issueCreated.emit();
+        this.closed.emit();
       }, 800);
     } catch (err: any) {
-      this.error = err?.message || 'Failed to create issue. Please try again.';
+      this.toastError(err?.message || 'Failed to create issue. Please try again.');
     } finally {
       this.loading = false;
     }
   }
 
   resetForm(): void {
+    this.showMenu = false;
+    if (confirm('Are you sure you want to reset the form?')) {
+      this.resetFormData();
+      this.toastSuccess('Form has been reset.');
+    }
+  }
+
+  resetFormData(): void {
     this.title = '';
     this.description = '';
     this.estimatedTime = null;
@@ -136,6 +151,32 @@ export class CreateIssueComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.cancelled.emit();
+    if (this.title || this.description || this.estimatedTime || this.dueDate) {
+      if (confirm('You have unsaved changes. Do you want to discard them?')) {
+        this.cancelled.emit();
+        this.toastSuccess('Changes discarded.');
+      }
+    } else {
+      this.cancelled.emit();
+    }
+  }
+
+  closeModal(): void {
+    if (this.title || this.description || this.estimatedTime || this.dueDate) {
+      if (confirm('You have unsaved data. Do you want to close without saving?')) {
+        this.closed.emit();
+        this.toastSuccess('Closed without saving.');
+      }
+    } else {
+      this.closed.emit();
+    }
+  }
+
+  // toast helpers
+  private toastSuccess(detail: string) {
+    this.messageService.add({ severity: 'success', summary: 'Success', detail });
+  }
+  private toastError(detail: string) {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail });
   }
 }

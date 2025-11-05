@@ -13,4 +13,96 @@
   font-family: "Poppins", sans-serif;
 }
 
+/* Frosted glass toast look */
+.app-toast.p-toast {
+  inset: 16px 16px auto auto; /* top-right spacing */
+}
+
+.app-toast .p-toast-message {
+  backdrop-filter: blur(12px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+  color: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 12px 14px;
+  min-width: 320px;
+  max-width: 420px;
+  position: relative;
+}
+
+/* Gradient accent bar at top */
+.app-toast .p-toast-message::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #ec4899, #a855f7, #1e40af);
+}
+
+/* Message layout */
+.app-toast .p-toast-message-content {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: start;
+  gap: 10px;
+}
+
+/* Icon sizing */
+.app-toast .p-toast-message-icon {
+  font-size: 1rem;
+  line-height: 1;
+  margin-top: 2px;
+  opacity: 0.95;
+}
+
+/* Title & detail text */
+.app-toast .p-toast-summary {
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: .2px;
+}
+.app-toast .p-toast-detail {
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: #d1d5db; /* gray-300 */
+}
+
+/* Close button */
+.app-toast .p-toast-icon-close {
+  border-radius: 10px;
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform .15s ease, background .15s ease;
+}
+.app-toast .p-toast-icon-close:hover {
+  transform: scale(1.06);
+  background: rgba(255,255,255,0.10);
+}
+
+/* Severity tints */
+.app-toast .p-toast-message-success {
+  box-shadow: 0 10px 25px rgba(16,185,129,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.app-toast .p-toast-message-info {
+  box-shadow: 0 10px 25px rgba(59,130,246,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.app-toast .p-toast-message-warn {
+  box-shadow: 0 10px 25px rgba(245,158,11,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.app-toast .p-toast-message-error {
+  box-shadow: 0 10px 25px rgba(239,68,68,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Optional: subtle entrance lift */
+@keyframes toastLift {
+  from { transform: translateY(-6px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.app-toast .p-toast-message {
+  animation: toastLift .18s ease-out;
+}
+
+
 

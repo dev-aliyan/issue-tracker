@@ -29,3 +29,15 @@
   background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
 }
+
+[_nghost-ng-c864047452] .p-dropdown {
+    background: rgba(17, 24, 39) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    color: #e2e8f0 !important;
+    font-size: 0.95rem !important;
+    width: 100%;
+    padding: 0.4rem 0.5rem 0.4rem 0.5rem;
+    transition: all 0.25s 
+ease;
+}

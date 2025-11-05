@@ -50,14 +50,6 @@ const routes: Routes = [
         path: 'issue/create',
         loadComponent: () => import('./components/issue/create-issue/create-issue.component').then(m => m.CreateIssueComponent)
       },
-      {
-        path: 'issue/edit/:id',
-        loadComponent: () => import('./components/issue/edit-issue/edit-issue.component').then(m => m.EditIssueComponent)
-      },
-      {
-        path: 'issue/:id',
-        loadComponent: () => import('./components/issue/view-issue/view-issue.component').then(m => m.ViewIssueComponent)
-      }
     ]
   },
   {
