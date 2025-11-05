@@ -1,29 +1,31 @@
+/* Input Text Styles - Compact */
 :host ::ng-deep input.p-inputtext:not(.p-dropdown-label) {
   background: rgba(17, 24, 39, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 8px;
   color: #e2e8f0;
-  font-size: 0.95rem;
-  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
   width: 100%;
-  backdrop-filter: blur(10px);
+ 
   transition: all 0.25s ease;
 }
 
 :host ::ng-deep input.p-inputtext:not(.p-dropdown-label):hover {
   border-color: #7c3aed;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.3);
 }
 
 :host ::ng-deep input.p-inputtext:not(.p-dropdown-label):focus {
   border-color: #6366f1;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
   outline: none;
   background: rgba(17, 24, 39, 0.4);
 }
 
 :host ::ng-deep input.p-inputtext:not(.p-dropdown-label)::placeholder {
-  color: rgba(148, 163, 184, 0.8);
+  color: rgba(148, 163, 184, 0.7);
+  font-size: 0.8125rem;
 }
 
 :host ::ng-deep input.p-inputtext:not(.p-dropdown-label):disabled {
@@ -32,40 +34,41 @@
   background: rgba(30, 41, 59, 0.6);
 }
 
+/* Dropdown Styles - Compact */
 :host ::ng-deep .p-dropdown {
   background: rgba(17, 24, 39, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
   color: #e2e8f0 !important;
-  font-size: 0.95rem !important;
+  font-size: 0.875rem !important;
   width: 100%;
-  padding: 0.6rem 0.5rem 0.4rem 0.5rem;
-  backdrop-filter: blur(10px);
+  padding: 0.4rem 0.5rem 0.3rem 0.5rem;
   transition: all 0.25s ease;
 }
 
 :host ::ng-deep .p-dropdown:hover {
   border-color: #7c3aed !important;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4) !important;
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.3) !important;
 }
 
 :host ::ng-deep .p-dropdown.p-focus,
 :host ::ng-deep .p-dropdown.p-dropdown-open {
   border-color: #6366f1 !important;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5) !important;
   background: rgba(17, 24, 39, 0.4) !important;
 }
 
 :host ::ng-deep .p-dropdown-label {
   color: #f1f5f9 !important;
-  padding-left: 0.6rem;
-  padding-top: 0.2rem;
+  padding-left: 0.5rem;
+  padding-top: 0.15rem;
+  font-size: 0.875rem;
 }
 
 :host ::ng-deep .p-dropdown-trigger {
   background: transparent !important;
   border-left: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 0.6rem !important;
+  padding: 0.4rem !important;
   color: #9ca3af !important;
   transition: color 0.25s ease;
 }
@@ -77,15 +80,15 @@
 :host ::ng-deep .p-dropdown-panel {
   background: rgb(17, 24, 39);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
 }
 
 :host ::ng-deep .p-dropdown-items .p-dropdown-item {
   color: #e2e8f0;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 6px;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
 }
 
@@ -99,17 +102,16 @@
   color: #fff !important;
 }
 
-
+/* Textarea Styles - Compact */
 :host ::ng-deep .p-inputtextarea {
-  background: rgba(17, 24, 39, 0.2); 
+  background: rgba(17, 24, 39, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 8px;
   color: #e2e8f0;
-  font-size: 0.95rem;
-  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
   width: 100%;
   resize: vertical;
-  backdrop-filter: blur(10px);
   transition: all 0.25s ease;
   font-family: 'Inter', sans-serif;
   line-height: 1.5;
@@ -117,20 +119,20 @@
 
 :host ::ng-deep .p-inputtextarea:hover {
   border-color: #7c3aed;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.3);
 }
 
 :host ::ng-deep .p-inputtextarea:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
   outline: none;
   background: rgba(17, 24, 39, 0.4);
 }
 
 :host ::ng-deep .p-inputtextarea::placeholder {
-  color: rgba(148, 163, 184, 0.8);
+  color: rgba(148, 163, 184, 0.7);
+  font-size: 0.8125rem;
 }
-
 
 :host ::ng-deep .p-inputtextarea:disabled {
   opacity: 0.5;
@@ -138,48 +140,48 @@
   background: rgba(30, 41, 59, 0.6);
 }
 
-
+/* Calendar Styles - Compact */
 :host ::ng-deep .p-calendar {
   width: 100%;
   background: rgba(17, 24, 39, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 8px;
   color: #e2e8f0;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   transition: all 0.25s ease;
 }
 
 :host ::ng-deep .p-calendar:hover {
   border-color: #7c3aed;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.3);
 }
 
 :host ::ng-deep .p-calendar:focus-within {
   border-color: #6366f1;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
   background: rgba(17, 24, 39, 0.4);
 }
-
 
 :host ::ng-deep .p-inputtext.p-calendar-input {
   background: transparent !important;
   border: none !important;
   color: #f1f5f9 !important;
   width: 100%;
-  padding: 0.75rem 1rem !important;
-  font-size: 0.95rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
 }
 
 :host ::ng-deep .p-inputtext.p-calendar-input::placeholder {
-  color: rgba(148, 163, 184, 0.8);
+  color: rgba(148, 163, 184, 0.7);
+  font-size: 0.8125rem;
 }
 
 :host ::ng-deep .p-calendar .p-datepicker-trigger {
   background: rgba(17, 24, 39) !important;
   border-left: 1px solid rgba(255, 255, 255, 0.05);
   color: #9ca3af !important;
-  padding: 0.7rem !important;
-  border-radius: 0 10px 10px 0 !important;
+  padding: 0.5rem !important;
+  border-radius: 0 8px 8px 0 !important;
   transition: color 0.25s ease, background 0.25s ease;
 }
 
@@ -191,15 +193,13 @@
 :host ::ng-deep .p-datepicker {
   background: rgba(17, 24, 39, 0.9) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(15px);
+  border-radius: 10px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
 }
-
 
 :host ::ng-deep .p-datepicker td > span {
   color: #e2e8f0 !important;
-  border-radius: 8px !important;
+  border-radius: 6px !important;
   transition: all 0.2s ease;
 }
 
@@ -218,4 +218,32 @@
   opacity: 0.5;
   cursor: not-allowed;
   background: rgba(30, 41, 59, 0.6);
+}
+
+/* Input Number Styles - Compact */
+:host ::ng-deep .p-inputnumber {
+  width: 100%;
+}
+
+:host ::ng-deep .p-inputnumber-input {
+  background: rgba(17, 24, 39, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  transition: all 0.25s ease;
+}
+
+:host ::ng-deep .p-inputnumber-input:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.3);
+}
+
+:host ::ng-deep .p-inputnumber-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+  outline: none;
+  background: rgba(17, 24, 39, 0.4);
 }
